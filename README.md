@@ -7,7 +7,7 @@ Xpenso is a full-stack expense management application that allows users to track
 - **Backend:** Java, Spring Boot, Spring Security, REST APIs  
 - **Frontend:** React.js, TailwindCSS  
 - **Database:** MySQL (JPA/Hibernate)  
-- **Tools:** Docker, Maven, Cloudinary 
+- **Tools:** Docker, Maven, Cloudinary, EmailJS
 
 ---
 
