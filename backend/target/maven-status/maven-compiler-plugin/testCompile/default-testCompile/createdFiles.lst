@@ -1,0 +1,5 @@
+com\example\xpenso\service\CategoryServiceTest.class
+com\example\xpenso\service\ExpenseServiceTest.class
+com\example\xpenso\controller\ProfileControllerTest.class
+com\example\xpenso\service\ProfileServiceTest.class
+com\example\xpenso\controller\ExpenseControllerTest.class

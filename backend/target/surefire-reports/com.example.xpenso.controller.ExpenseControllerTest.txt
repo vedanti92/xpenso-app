@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.example.xpenso.controller.ExpenseControllerTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.072 s -- in com.example.xpenso.controller.ExpenseControllerTest
