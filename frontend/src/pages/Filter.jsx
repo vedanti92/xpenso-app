@@ -60,7 +60,7 @@ function Filter() {
             <div className="mb-4">
               <h5 className="text-lg font-semibold">Select Filters</h5>
               <p className="text-xs text-red-500">
-                * Only transaction type is required. Other filters are optional.
+                * Transaction type is required. Other filters are optional.
               </p>
             </div>
             <form className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-6 gap-4">
