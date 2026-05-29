@@ -3,8 +3,17 @@ import React, { useState } from "react";
 import TransactionInfoCard from "./TransactionInfoCard";
 import moment from "moment";
 
+const PAGE_SIZE = 5;
+
 function IncomeList({ transactions, onDelete, onDownload, onEmail }) {
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(transactions.length / PAGE_SIZE);
+  const paginatedTransactions = transactions.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   const handleEmail = async () => {
     setLoading(true);
@@ -61,8 +70,7 @@ function IncomeList({ transactions, onDelete, onDownload, onEmail }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2">
-        {/* Incomes display */}
-        {transactions.map((income) => (
+        {paginatedTransactions.map((income) => (
           <TransactionInfoCard
             key={income.id}
             title={income.name}
@@ -74,6 +82,28 @@ function IncomeList({ transactions, onDelete, onDownload, onEmail }) {
           />
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-end gap-2 mt-4">
+          <button
+            className="card-btn"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+          >
+            Prev
+          </button>
+          <span className="text-sm text-gray-600">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            className="card-btn"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
