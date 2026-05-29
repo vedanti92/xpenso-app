@@ -17,32 +17,18 @@ function Filter() {
   const [sortOrder, setSortOrder] = useState("");
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearch = async (e) => {
     e.preventDefault();
 
-    // validation
     if (!type) {
       toast.error("Please select a transaction type.");
       return;
     }
 
-    if (!sortField) {
-      toast.error("Please select a sort field.");
-      return;
-    }
-
-    if (!sortOrder) {
-      toast.error("Please select a sort order.");
-      return;
-    }
-
-    if (!startDate || !endDate) {
-      toast.error("Please select both start and end dates.");
-      return;
-    }
-
     setLoading(true);
+    setHasSearched(true);
     try {
       const response = await axiosConfig.post(API_ENDPOINTS.APPLY_FILTER, {
         type,
@@ -74,7 +60,7 @@ function Filter() {
             <div className="mb-4">
               <h5 className="text-lg font-semibold">Select Filters</h5>
               <p className="text-xs text-red-500">
-                * To begin searching, make sure all filters are selected.
+                * Only transaction type is required. Other filters are optional.
               </p>
             </div>
             <form className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-6 gap-4">
@@ -83,14 +69,13 @@ function Filter() {
                   htmlFor="type"
                   className="block text-sm font-medium mb-1"
                 >
-                  Type
+                  Type *
                 </label>
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                   id="type"
                   className="w-full border rounded px-3 py-2"
-                  defaultValue=""
                 >
                   <option value="" disabled>
                     Select Type
@@ -141,11 +126,8 @@ function Filter() {
                   onChange={(e) => setSortField(e.target.value)}
                   id="sortfield"
                   className="w-full border rounded px-3 py-2"
-                  defaultValue=""
                 >
-                  <option value="" disabled>
-                    Select Field
-                  </option>
+                  <option value="">None</option>
                   <option value="date">Date</option>
                   <option value="amount">Amount</option>
                   <option value="category">Category</option>
@@ -163,11 +145,8 @@ function Filter() {
                   onChange={(e) => setSortOrder(e.target.value)}
                   id="sortorder"
                   className="w-full border rounded px-3 py-2"
-                  defaultValue=""
                 >
-                  <option value="" disabled>
-                    Select Order
-                  </option>
+                  <option value="">None</option>
                   <option value="asc">Ascending</option>
                   <option value="desc">Descending</option>
                 </select>
@@ -202,30 +181,32 @@ function Filter() {
             <div className="flex justify-between items-center mb-4">
               <h5 className="text-2xl font-semibold">Results</h5>
             </div>
-            {transactions.length === 0 && !loading ? (
+            {!hasSearched && (
               <p className="text-gray-500">
                 Use the filters and hit the search button to view matching
                 transactions.
               </p>
-            ) : (
-              ""
             )}
-            {loading ? (
+            {loading && (
               <p className="text-gray-500">Loading Transactions...</p>
-            ) : (
-              ""
             )}
-            {transactions.map((transaction) => (
-              <TransactionInfoCard
-                key={transacttion.id}
-                title={transacttion.name}
-                icon={transacttion.icon}
-                date={moment(transacttion.date).format("Do MMM YYYY")}
-                amount={transacttion.amount}
-                type={type}
-                hideDeleteBtn
-              />
-            ))}
+            {hasSearched && !loading && transactions.length === 0 && (
+              <p className="text-gray-500">
+                No transactions found for the selected filters.
+              </p>
+            )}
+            {!loading &&
+              transactions.map((transaction) => (
+                <TransactionInfoCard
+                  key={transaction.id}
+                  title={transaction.name}
+                  icon={transaction.icon}
+                  date={moment(transaction.date).format("Do MMM YYYY")}
+                  amount={transaction.amount}
+                  type={type}
+                  hideDeleteBtn
+                />
+              ))}
           </div>
         </div>
       </Dashboard>
