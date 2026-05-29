@@ -15,7 +15,7 @@ function Filter() {
   const [keyword, setKeyword] = useState("");
   const [sortField, setSortField] = useState("");
   const [sortOrder, setSortOrder] = useState("");
-  const [transacttions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const handleSearch = async (e) => {
@@ -34,6 +34,11 @@ function Filter() {
 
     if (!sortOrder) {
       toast.error("Please select a sort order.");
+      return;
+    }
+
+    if (!startDate || !endDate) {
+      toast.error("Please select both start and end dates.");
       return;
     }
 
@@ -69,8 +74,7 @@ function Filter() {
             <div className="mb-4">
               <h5 className="text-lg font-semibold">Select Filters</h5>
               <p className="text-xs text-red-500">
-                * To begin searching, make sure "Type", "Sort Field", and "Sort
-                Order" are selected.
+                * To begin searching, make sure all filters are selected.
               </p>
             </div>
             <form className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-6 gap-4">
@@ -198,7 +202,7 @@ function Filter() {
             <div className="flex justify-between items-center mb-4">
               <h5 className="text-2xl font-semibold">Results</h5>
             </div>
-            {transacttions.length === 0 && !loading ? (
+            {transactions.length === 0 && !loading ? (
               <p className="text-gray-500">
                 Use the filters and hit the search button to view matching
                 transactions.
@@ -211,7 +215,7 @@ function Filter() {
             ) : (
               ""
             )}
-            {transacttions.map((transacttion) => (
+            {transactions.map((transaction) => (
               <TransactionInfoCard
                 key={transacttion.id}
                 title={transacttion.name}
