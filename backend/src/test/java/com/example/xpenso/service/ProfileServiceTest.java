@@ -1,28 +1,32 @@
 package com.example.xpenso.service;
 
-import com.example.xpenso.dto.AuthDTO;
-import com.example.xpenso.dto.ProfileDTO;
-import com.example.xpenso.entity.ProfileEntity;
-import com.example.xpenso.repository.ProfileRepository;
-import com.example.xpenso.util.JwtUtil;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import com.example.xpenso.dto.AuthDTO;
+import com.example.xpenso.dto.ProfileDTO;
+import com.example.xpenso.entity.ProfileEntity;
+import com.example.xpenso.repository.ProfileRepository;
+import com.example.xpenso.util.JwtUtil;
 
 @ExtendWith(MockitoExtension.class)
 class ProfileServiceTest {
@@ -130,40 +134,6 @@ class ProfileServiceTest {
         boolean result = profileService.isAccountActive("vedanti@test.com");
 
         assertThat(result).isTrue();
-    }
-
-    // ─── resendActivationEmail ─────────────────────────────────────────────────
-
-    @Test
-    void resendActivationEmail_shouldReturnTrue_whenEmailFoundAndNotActive() {
-        when(profileRepository.findByEmail("vedanti@test.com")).thenReturn(Optional.of(mockProfile));
-        when(emailService.sendEmailAsync(anyString(), anyString(), anyString()))
-                .thenReturn(java.util.concurrent.CompletableFuture.completedFuture(null));
-
-        org.springframework.test.util.ReflectionTestUtils.setField(profileService, "activationURL", "http://localhost:8080");
-
-        boolean result = profileService.resendActivationEmail("vedanti@test.com");
-
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void resendActivationEmail_shouldReturnFalse_whenAlreadyActive() {
-        mockProfile.setIsActive(true);
-        when(profileRepository.findByEmail("vedanti@test.com")).thenReturn(Optional.of(mockProfile));
-
-        boolean result = profileService.resendActivationEmail("vedanti@test.com");
-
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void resendActivationEmail_shouldReturnFalse_whenEmailNotFound() {
-        when(profileRepository.findByEmail("ghost@test.com")).thenReturn(Optional.empty());
-
-        boolean result = profileService.resendActivationEmail("ghost@test.com");
-
-        assertThat(result).isFalse();
     }
 
     // ─── authenticateAndGenerateToken ─────────────────────────────────────────

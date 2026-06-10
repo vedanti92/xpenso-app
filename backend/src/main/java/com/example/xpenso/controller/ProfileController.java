@@ -1,15 +1,20 @@
 package com.example.xpenso.controller;
 
-import com.example.xpenso.dto.AuthDTO;
-import com.example.xpenso.dto.ProfileDTO;
-import com.example.xpenso.entity.ProfileEntity;
-import com.example.xpenso.service.ProfileService;
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import com.example.xpenso.dto.AuthDTO;
+import com.example.xpenso.dto.ProfileDTO;
+import com.example.xpenso.service.ProfileService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,23 +25,6 @@ public class ProfileController {
     public ResponseEntity<Map<String, Object>> registerProfile(@RequestBody ProfileDTO profileDTO) {
         Map<String, Object> response = profileService.registerProfile(profileDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @PostMapping("/resend-activation")
-    public ResponseEntity<Map<String, Object>> resendActivationEmail(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        if (email == null || email.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Email is required."));
-        }
-        
-        boolean sent = profileService.resendActivationEmail(email);
-        if (sent) {
-            return ResponseEntity.ok(Map.of("message", "Activation email has been sent. Please check your inbox."));
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Account not found or already activated."));
-        }
     }
 
     @GetMapping("/activate")

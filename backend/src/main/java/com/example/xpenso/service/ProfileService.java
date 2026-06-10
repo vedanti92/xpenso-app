@@ -1,11 +1,8 @@
 package com.example.xpenso.service;
 
-import com.example.xpenso.dto.AuthDTO;
-import com.example.xpenso.dto.ProfileDTO;
-import com.example.xpenso.entity.ProfileEntity;
-import com.example.xpenso.repository.ProfileRepository;
-import com.example.xpenso.util.JwtUtil;
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,8 +13,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.UUID;
+import com.example.xpenso.dto.AuthDTO;
+import com.example.xpenso.dto.ProfileDTO;
+import com.example.xpenso.entity.ProfileEntity;
+import com.example.xpenso.repository.ProfileRepository;
+import com.example.xpenso.util.JwtUtil;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -55,31 +57,12 @@ public class ProfileService {
         // Include activation link in response (useful if email fails or for development)
         if (returnActivationLink) {
             response.put("activationLink", activationLink);
-            response.put("message", "Registration successful. Please check your email for activation link. If you don't receive it, use the activation link provided below or request a resend.");
+            response.put("message", "Registration successful. Please check your email for activation link.");
         } else {
-            response.put("message", "Registration successful. Please check your email for activation link. If you don't receive it, you can request a resend.");
+            response.put("message", "Registration successful. Please check your email for activation link.");
         }
         
         return response;
-    }
-
-    public boolean resendActivationEmail(String email) {
-        return profileRepository.findByEmail(email)
-                .map(profile -> {
-                    if (profile.getIsActive()) {
-                        return false; // Already activated
-                    }
-                    
-                    // Generate new activation link
-                    String activationLink = activationURL + "/activate?token=" + profile.getActivationToken();
-                    String subject = "Activate your Xpenso account.";
-                    String body = "Click on the following link to activate your Xpenso account: " + activationLink;
-                    
-                    // Send email asynchronously
-                    emailService.sendEmailAsync(profile.getEmail(), subject, body);
-                    return true;
-                })
-                .orElse(false); // Email not found
     }
 
     public ProfileEntity toEntity(ProfileDTO profileDTO) {
