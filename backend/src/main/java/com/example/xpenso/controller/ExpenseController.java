@@ -1,11 +1,12 @@
 package com.example.xpenso.controller;
 
+import jakarta.validation.Valid;
+
 import com.example.xpenso.dto.ExpenseDTO;
 import com.example.xpenso.service.ExpenseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class ExpenseController {
     private final ExpenseService expenseService;
 
     @PostMapping
-    public ResponseEntity<ExpenseDTO> addExpense(@RequestBody ExpenseDTO dto) {
+    public ResponseEntity<ExpenseDTO> addExpense(@Valid @RequestBody ExpenseDTO dto) {
         ExpenseDTO saved = expenseService.addExpense(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }

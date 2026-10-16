@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({"/status", "/health"})
+@RequestMapping({ "/status", "/health" })
 public class HomeController {
     @GetMapping
-    public String healthCheck() { //endpoint
+    public String healthCheck() { // endpoint
         return "Application is running.";
     }
 }

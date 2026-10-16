@@ -41,27 +41,29 @@ public class ProfileService {
         ProfileEntity newProfile = toEntity(profileDTO);
         newProfile.setActivationToken(UUID.randomUUID().toString());
         newProfile = profileRepository.save(newProfile);
-        
+
         // Generate activation link
         String activationLink = activationURL + "/activate?token=" + newProfile.getActivationToken();
-        
-        // Send activation email asynchronously - don't block registration if email fails
+
+        // Send activation email asynchronously - don't block registration if email
+        // fails
         String subject = "Activate your Xpenso account.";
         String body = "Click on the following link to activate your Xpenso account: " + activationLink;
         emailService.sendEmailAsync(newProfile.getEmail(), subject, body);
-        
+
         // Build response
         Map<String, Object> response = new java.util.HashMap<>();
         response.put("profile", toDTO(newProfile));
-        
-        // Include activation link in response (useful if email fails or for development)
+
+        // Include activation link in response (useful if email fails or for
+        // development)
         if (returnActivationLink) {
             response.put("activationLink", activationLink);
             response.put("message", "Registration successful. Please check your email for activation link.");
         } else {
             response.put("message", "Registration successful. Please check your email for activation link.");
         }
-        
+
         return response;
     }
 
@@ -89,7 +91,7 @@ public class ProfileService {
     }
 
     public boolean activateProfile(String activationToken) {
-        return  profileRepository.findByActivationToken(activationToken)
+        return profileRepository.findByActivationToken(activationToken)
                 .map(profile -> {
                     profile.setIsActive(true);
                     profileRepository.save(profile);
@@ -107,7 +109,8 @@ public class ProfileService {
     public ProfileEntity getCurrentProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return profileRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("Profile not found with email: " + authentication.getName()));
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "Profile not found with email: " + authentication.getName()));
     }
 
     public ProfileDTO getPublicProfile(String email) {
@@ -116,7 +119,7 @@ public class ProfileService {
             currentUser = getCurrentProfile();
         } else {
             currentUser = profileRepository.findByEmail(email)
-                    .orElseThrow(()  -> new UsernameNotFoundException("Profile not found with email: " + email));
+                    .orElseThrow(() -> new UsernameNotFoundException("Profile not found with email: " + email));
         }
         return ProfileDTO.builder()
                 .id(currentUser.getId())
@@ -130,9 +133,10 @@ public class ProfileService {
 
     public Map<String, Object> authenticateAndGenerateToken(AuthDTO authDTO) {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authDTO.getEmail(), authDTO.getPassword()));
+            authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(authDTO.getEmail(), authDTO.getPassword()));
             UserDetails userDetails = appUserDetailsService.loadUserByUsername(authDTO.getEmail());
-//            generate JWT token
+            // generate JWT token
             String token = jwtUtil.generateToken(userDetails);
             return Map.of("token", token,
                     "user", getPublicProfile(authDTO.getEmail()));

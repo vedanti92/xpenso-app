@@ -3,10 +3,11 @@ import React, { useState } from "react";
 import TransactionInfoCard from "./TransactionInfoCard";
 import moment from "moment";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 6;
 
 function ExpenseList({ transactions, onDelete, onDownload, onEmail }) {
-  const [loading, setLoading] = useState(false);
+  const [isEmailing, setIsEmailing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(transactions.length / PAGE_SIZE);
@@ -16,20 +17,20 @@ function ExpenseList({ transactions, onDelete, onDownload, onEmail }) {
   );
 
   const handleEmail = async () => {
-    setLoading(true);
+    setIsEmailing(true);
     try {
       await onEmail();
     } finally {
-      setLoading(false);
+      setIsEmailing(false);
     }
   };
 
   const handleDownload = async () => {
-    setLoading(true);
+    setIsDownloading(true);
     try {
       await onDownload();
     } finally {
-      setLoading(false);
+      setIsDownloading(false);
     }
   };
 
@@ -38,8 +39,12 @@ function ExpenseList({ transactions, onDelete, onDownload, onEmail }) {
       <div className="flex items-center justify-between">
         <h5 className="text-lg">Expense Sources</h5>
         <div className="flex items-center justify-end gap-2">
-          <button disabled={loading} className="card-btn" onClick={handleEmail}>
-            {loading ? (
+          <button
+            disabled={isEmailing || isDownloading}
+            className="card-btn"
+            onClick={handleEmail}
+          >
+            {isEmailing ? (
               <>
                 <LoaderCircle size={15} className="w-4 h-4 animate-spin" />{" "}
                 Emailing...
@@ -51,11 +56,11 @@ function ExpenseList({ transactions, onDelete, onDownload, onEmail }) {
             )}
           </button>
           <button
-            disabled={loading}
+            disabled={isEmailing || isDownloading}
             className="card-btn"
             onClick={handleDownload}
           >
-            {loading ? (
+            {isDownloading ? (
               <>
                 <LoaderCircle size={15} className="w-4 h-4 animate-spin" />{" "}
                 Downloading...

@@ -54,13 +54,13 @@ public class SecurityConfig {
         jwtRequestFilter,
         UsernamePasswordAuthenticationFilter.class
       )
-      // ✅ Register your authentication provider here
+      // Register your authentication provider here
       .authenticationProvider(daoAuthenticationProvider());
 
     return httpSecurity.build();
   }
 
-  // ✅ Define a separate bean for DaoAuthenticationProvider
+  // Define a separate bean for DaoAuthenticationProvider
   @Bean
   public DaoAuthenticationProvider daoAuthenticationProvider() {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();

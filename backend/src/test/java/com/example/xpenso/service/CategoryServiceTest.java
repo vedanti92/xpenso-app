@@ -63,7 +63,8 @@ class CategoryServiceTest {
     @Test
     void saveCategory_shouldSaveAndReturnDTO() {
         when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(categoryRepository.existsByNameAndProfileId("Food", 1L)).thenReturn(false);
+        when(categoryRepository.existsByNameAndTypeAndProfileId("Food", "expense", 1L))
+                .thenReturn(false);
         when(categoryRepository.save(any(CategoryEntity.class))).thenReturn(mockCategoryEntity);
 
         CategoryDTO result = categoryService.saveCategory(mockCategoryDTO);
@@ -77,11 +78,42 @@ class CategoryServiceTest {
     @Test
     void saveCategory_shouldThrow_whenDuplicateName() {
         when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(categoryRepository.existsByNameAndProfileId("Food", 1L)).thenReturn(true);
+        when(categoryRepository.existsByNameAndTypeAndProfileId("Food", "expense", 1L))
+                .thenReturn(true);
 
         assertThatThrownBy(() -> categoryService.saveCategory(mockCategoryDTO))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("already exists");
+    }
+
+    @Test
+    void saveCategory_shouldAllowSameNameForDifferentTypes() {
+        CategoryDTO incomeDTO = CategoryDTO.builder()
+                .name("Food")
+                .icon("🍔")
+                .type("income")
+                .build();
+
+        CategoryEntity incomeEntity = CategoryEntity.builder()
+                .id(11L)
+                .name("Food")
+                .icon("🍔")
+                .type("income")
+                .profile(mockProfile)
+                .build();
+
+        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+        when(categoryRepository.existsByNameAndTypeAndProfileId(
+                "Food", "income", 1L)).thenReturn(false);
+        when(categoryRepository.save(any(CategoryEntity.class)))
+                .thenReturn(incomeEntity);
+
+        CategoryDTO result = categoryService.saveCategory(incomeDTO);
+
+        assertThat(result.getName()).isEqualTo("Food");
+        assertThat(result.getType()).isEqualTo("income");
+
+        verify(categoryRepository).save(any(CategoryEntity.class));
     }
 
     // ─── getCategoriesForCurrentUser ───────────────────────────────────────────

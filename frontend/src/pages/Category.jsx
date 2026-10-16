@@ -47,13 +47,17 @@ function Category() {
       return;
     }
 
-    // check if the category already exists
-    const isDuplicate = categoryData.some((category) => {
-      return category.name.toLowerCase() === name.trim().toLowerCase();
+    // Check for duplicate category name within the same type
+    const isDuplicate = categoryData.some((existingCategory) => {
+      return (
+        existingCategory.name.trim().toLowerCase() ===
+          name.trim().toLowerCase() &&
+        existingCategory.type.toLowerCase() === type.toLowerCase()
+      );
     });
 
     if (isDuplicate) {
-      toast.error("Category name already exists.");
+      toast.error("Category with this name and type already exists.");
       return;
     }
 
@@ -104,7 +108,7 @@ function Category() {
     } catch (error) {
       console.error(
         "Error updating category: ",
-        error.response.data.message || error.message
+        error.response.data.message || error.message,
       );
       toast.error(error.response.data.message || "Failed to update category.");
     }

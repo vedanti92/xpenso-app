@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 @Service
 public class ExcelService {
     public void writeIncomesToExcel(OutputStream os, List<IncomeDTO> incomes) throws IOException {
-        try(Workbook workbook = new XSSFWorkbook()) {
+        try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Incomes");
             Row header = sheet.createRow(0);
             header.createCell(0).setCellValue("S. No.");
@@ -39,7 +39,7 @@ public class ExcelService {
     }
 
     public void writeExpensesToExcel(OutputStream os, List<ExpenseDTO> expenses) throws IOException {
-        try(Workbook workbook = new XSSFWorkbook()) {
+        try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Expenses");
             Row header = sheet.createRow(0);
             header.createCell(0).setCellValue("S. No.");

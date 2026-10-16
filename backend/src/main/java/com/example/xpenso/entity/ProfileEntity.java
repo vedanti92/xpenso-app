@@ -33,7 +33,8 @@ public class ProfileEntity {
     private Boolean isActive;
     private String activationToken;
 
-    public void prePersist(){
+    @PrePersist
+    public void prePersist() {
         if (this.isActive == null) {
             isActive = false;
         }

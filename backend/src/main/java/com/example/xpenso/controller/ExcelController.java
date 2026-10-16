@@ -23,13 +23,15 @@ public class ExcelController {
     public void downloadIncomeExcel(HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=income_details.xlsx");
-        excelService.writeIncomesToExcel(response.getOutputStream(), incomeService.getCurrentMonthIncomesForCurrentUser());
+        excelService.writeIncomesToExcel(response.getOutputStream(),
+                incomeService.getCurrentMonthIncomesForCurrentUser());
     }
 
     @GetMapping("/download/expense")
     public void downloadExpenseExcel(HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=expense_details.xlsx");
-        excelService.writeExpensesToExcel(response.getOutputStream(), expenseService.getCurrentMonthExpensesForCurrentUser());
+        excelService.writeExpensesToExcel(response.getOutputStream(),
+                expenseService.getCurrentMonthExpensesForCurrentUser());
     }
 }

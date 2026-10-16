@@ -28,198 +28,211 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ExpenseServiceTest {
 
-    @Mock
-    private CategoryRepository categoryRepository;
+        @Mock
+        private CategoryRepository categoryRepository;
 
-    @Mock
-    private ExpenseRepository expenseRepository;
+        @Mock
+        private ExpenseRepository expenseRepository;
 
-    @Mock
-    private ProfileService profileService;
+        @Mock
+        private ProfileService profileService;
 
-    @InjectMocks
-    private ExpenseService expenseService;
+        @InjectMocks
+        private ExpenseService expenseService;
 
-    private ProfileEntity mockProfile;
-    private CategoryEntity mockCategory;
-    private ExpenseEntity mockExpenseEntity;
-    private ExpenseDTO mockExpenseDTO;
+        private ProfileEntity mockProfile;
+        private CategoryEntity mockCategory;
+        private ExpenseEntity mockExpenseEntity;
+        private ExpenseDTO mockExpenseDTO;
 
-    @BeforeEach
-    void setUp() {
-        mockProfile = ProfileEntity.builder()
-                .id(1L)
-                .fullName("Vedanti Test")
-                .email("vedanti@test.com")
-                .build();
+        @BeforeEach
+        void setUp() {
+                mockProfile = ProfileEntity.builder()
+                                .id(1L)
+                                .fullName("Vedanti Test")
+                                .email("vedanti@test.com")
+                                .build();
 
-        mockCategory = CategoryEntity.builder()
-                .id(10L)
-                .name("Food")
-                .type("expense")
-                .profile(mockProfile)
-                .build();
+                mockCategory = CategoryEntity.builder()
+                                .id(10L)
+                                .name("Food")
+                                .type("expense")
+                                .profile(mockProfile)
+                                .build();
 
-        mockExpenseEntity = ExpenseEntity.builder()
-                .id(100L)
-                .name("Lunch")
-                .icon("🍱")
-                .amount(new BigDecimal("250.00"))
-                .date(LocalDate.now())
-                .category(mockCategory)
-                .profile(mockProfile)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+                mockExpenseEntity = ExpenseEntity.builder()
+                                .id(100L)
+                                .name("Lunch")
+                                .icon("🍱")
+                                .amount(new BigDecimal("250.00"))
+                                .date(LocalDate.now())
+                                .category(mockCategory)
+                                .profile(mockProfile)
+                                .createdAt(LocalDateTime.now())
+                                .updatedAt(LocalDateTime.now())
+                                .build();
 
-        mockExpenseDTO = ExpenseDTO.builder()
-                .name("Lunch")
-                .icon("🍱")
-                .amount(new BigDecimal("250.00"))
-                .date(LocalDate.now())
-                .categoryId(10L)
-                .build();
-    }
+                mockExpenseDTO = ExpenseDTO.builder()
+                                .name("Lunch")
+                                .icon("🍱")
+                                .amount(new BigDecimal("250.00"))
+                                .date(LocalDate.now())
+                                .categoryId(10L)
+                                .build();
+        }
 
-    // ─── addExpense ────────────────────────────────────────────────────────────
+        // ─── addExpense ────────────────────────────────────────────────────────────
 
-    @Test
-    void addExpense_shouldSaveAndReturnDTO() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(categoryRepository.findById(10L)).thenReturn(Optional.of(mockCategory));
-        when(expenseRepository.save(any(ExpenseEntity.class))).thenReturn(mockExpenseEntity);
+        @Test
+        void addExpense_shouldSaveAndReturnDTO() {
 
-        ExpenseDTO result = expenseService.addExpense(mockExpenseDTO);
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo("Lunch");
-        assertThat(result.getAmount()).isEqualByComparingTo("250.00");
-        assertThat(result.getCategoryName()).isEqualTo("Food");
-        verify(expenseRepository, times(1)).save(any(ExpenseEntity.class));
-    }
+                when(categoryRepository.findByIdAndProfileId(
+                                mockExpenseDTO.getCategoryId(),
+                                mockProfile.getId())).thenReturn(Optional.of(mockCategory));
 
-    @Test
-    void addExpense_shouldThrow_whenCategoryNotFound() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+                when(expenseRepository.save(any(ExpenseEntity.class)))
+                                .thenReturn(mockExpenseEntity);
 
-        assertThatThrownBy(() -> expenseService.addExpense(mockExpenseDTO))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Category not found");
-    }
+                ExpenseDTO result = expenseService.addExpense(mockExpenseDTO);
 
-    // ─── getCurrentMonthExpensesForCurrentUser ─────────────────────────────────
+                assertThat(result).isNotNull();
+                assertThat(result.getName()).isEqualTo("Lunch");
+                assertThat(result.getAmount()).isEqualByComparingTo("250.00");
+                assertThat(result.getCategoryName()).isEqualTo("Food");
 
-    @Test
-    void getCurrentMonthExpenses_shouldReturnListOfDTOs() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(expenseRepository.findByProfileIdAndDateBetween(eq(1L), any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(List.of(mockExpenseEntity));
+                verify(expenseRepository, times(1)).save(any(ExpenseEntity.class));
+        }
 
-        List<ExpenseDTO> result = expenseService.getCurrentMonthExpensesForCurrentUser();
+        @Test
+        void addExpense_shouldThrow_whenCategoryNotFound() {
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("Lunch");
-    }
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
 
-    @Test
-    void getCurrentMonthExpenses_shouldReturnEmptyList_whenNoExpenses() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(expenseRepository.findByProfileIdAndDateBetween(eq(1L), any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(List.of());
+                when(categoryRepository.findByIdAndProfileId(
+                                mockExpenseDTO.getCategoryId(),
+                                mockProfile.getId())).thenReturn(Optional.empty());
 
-        List<ExpenseDTO> result = expenseService.getCurrentMonthExpensesForCurrentUser();
+                assertThatThrownBy(() -> expenseService.addExpense(mockExpenseDTO))
+                                .isInstanceOf(RuntimeException.class)
+                                .hasMessageContaining("Category not found");
+        }
 
-        assertThat(result).isEmpty();
-    }
+        // ─── getCurrentMonthExpensesForCurrentUser ─────────────────────────────────
 
-    // ─── deleteExpense ─────────────────────────────────────────────────────────
+        @Test
+        void getCurrentMonthExpenses_shouldReturnListOfDTOs() {
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+                when(expenseRepository.findByProfileIdAndDateBetween(eq(1L), any(LocalDate.class),
+                                any(LocalDate.class)))
+                                .thenReturn(List.of(mockExpenseEntity));
 
-    @Test
-    void deleteExpense_shouldDeleteSuccessfully() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(expenseRepository.findById(100L)).thenReturn(Optional.of(mockExpenseEntity));
+                List<ExpenseDTO> result = expenseService.getCurrentMonthExpensesForCurrentUser();
 
-        expenseService.deleteExpense(100L);
+                assertThat(result).hasSize(1);
+                assertThat(result.get(0).getName()).isEqualTo("Lunch");
+        }
 
-        verify(expenseRepository, times(1)).delete(mockExpenseEntity);
-    }
+        @Test
+        void getCurrentMonthExpenses_shouldReturnEmptyList_whenNoExpenses() {
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+                when(expenseRepository.findByProfileIdAndDateBetween(eq(1L), any(LocalDate.class),
+                                any(LocalDate.class)))
+                                .thenReturn(List.of());
 
-    @Test
-    void deleteExpense_shouldThrow_whenExpenseNotFound() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(expenseRepository.findById(anyLong())).thenReturn(Optional.empty());
+                List<ExpenseDTO> result = expenseService.getCurrentMonthExpensesForCurrentUser();
 
-        assertThatThrownBy(() -> expenseService.deleteExpense(999L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Expense not found");
-    }
+                assertThat(result).isEmpty();
+        }
 
-    @Test
-    void deleteExpense_shouldThrow_whenUnauthorized() {
-        ProfileEntity otherProfile = ProfileEntity.builder().id(99L).email("other@test.com").build();
-        ExpenseEntity otherExpense = ExpenseEntity.builder()
-                .id(200L)
-                .profile(otherProfile)
-                .category(mockCategory)
-                .build();
+        // ─── deleteExpense ─────────────────────────────────────────────────────────
 
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(expenseRepository.findById(200L)).thenReturn(Optional.of(otherExpense));
+        @Test
+        void deleteExpense_shouldDeleteSuccessfully() {
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+                when(expenseRepository.findById(100L)).thenReturn(Optional.of(mockExpenseEntity));
 
-        assertThatThrownBy(() -> expenseService.deleteExpense(200L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Unauthorized");
-    }
+                expenseService.deleteExpense(100L);
 
-    // ─── getTotalExpenseForCurrentUser ─────────────────────────────────────────
+                verify(expenseRepository, times(1)).delete(mockExpenseEntity);
+        }
 
-    @Test
-    void getTotalExpense_shouldReturnTotal() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(expenseRepository.findTotalExpenseByProfileId(1L)).thenReturn(new BigDecimal("1500.00"));
+        @Test
+        void deleteExpense_shouldThrow_whenExpenseNotFound() {
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+                when(expenseRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        BigDecimal result = expenseService.getTotalExpenseForCurrentUser();
+                assertThatThrownBy(() -> expenseService.deleteExpense(999L))
+                                .isInstanceOf(RuntimeException.class)
+                                .hasMessageContaining("Expense not found");
+        }
 
-        assertThat(result).isEqualByComparingTo("1500.00");
-    }
+        @Test
+        void deleteExpense_shouldThrow_whenUnauthorized() {
+                ProfileEntity otherProfile = ProfileEntity.builder().id(99L).email("other@test.com").build();
+                ExpenseEntity otherExpense = ExpenseEntity.builder()
+                                .id(200L)
+                                .profile(otherProfile)
+                                .category(mockCategory)
+                                .build();
 
-    @Test
-    void getTotalExpense_shouldReturnZero_whenNull() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(expenseRepository.findTotalExpenseByProfileId(1L)).thenReturn(null);
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+                when(expenseRepository.findById(200L)).thenReturn(Optional.of(otherExpense));
 
-        BigDecimal result = expenseService.getTotalExpenseForCurrentUser();
+                assertThatThrownBy(() -> expenseService.deleteExpense(200L))
+                                .isInstanceOf(RuntimeException.class)
+                                .hasMessageContaining("Unauthorized");
+        }
 
-        assertThat(result).isEqualByComparingTo(BigDecimal.ZERO);
-    }
+        // ─── getTotalExpenseForCurrentUser ─────────────────────────────────────────
 
-    // ─── filterExpenses ────────────────────────────────────────────────────────
+        @Test
+        void getTotalExpense_shouldReturnTotal() {
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+                when(expenseRepository.findTotalExpenseByProfileId(1L)).thenReturn(new BigDecimal("1500.00"));
 
-    @Test
-    void filterExpenses_shouldReturnFilteredList() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(expenseRepository.findByProfileIdAndDateBetweenAndNameContainingIgnoreCase(
-                eq(1L), any(), any(), anyString(), any(Sort.class)))
-                .thenReturn(List.of(mockExpenseEntity));
+                BigDecimal result = expenseService.getTotalExpenseForCurrentUser();
 
-        List<ExpenseDTO> result = expenseService.filterExpenses(
-                LocalDate.now().minusDays(7), LocalDate.now(), "lunch", Sort.by("date"));
+                assertThat(result).isEqualByComparingTo("1500.00");
+        }
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("Lunch");
-    }
+        @Test
+        void getTotalExpense_shouldReturnZero_whenNull() {
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+                when(expenseRepository.findTotalExpenseByProfileId(1L)).thenReturn(null);
 
-    // ─── getLatest5ExpensesForCurrentUser ──────────────────────────────────────
+                BigDecimal result = expenseService.getTotalExpenseForCurrentUser();
 
-    @Test
-    void getLatest5Expenses_shouldReturnList() {
-        when(profileService.getCurrentProfile()).thenReturn(mockProfile);
-        when(expenseRepository.findTop5ByProfileIdOrderByDateDesc(1L))
-                .thenReturn(List.of(mockExpenseEntity));
+                assertThat(result).isEqualByComparingTo(BigDecimal.ZERO);
+        }
 
-        List<ExpenseDTO> result = expenseService.getLatest5ExpensesForCurrentUser();
+        // ─── filterExpenses ────────────────────────────────────────────────────────
 
-        assertThat(result).hasSize(1);
-    }
+        @Test
+        void filterExpenses_shouldReturnFilteredList() {
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+                when(expenseRepository.findByProfileIdAndDateBetweenAndNameContainingIgnoreCase(
+                                eq(1L), any(), any(), anyString(), any(Sort.class)))
+                                .thenReturn(List.of(mockExpenseEntity));
+
+                List<ExpenseDTO> result = expenseService.filterExpenses(
+                                LocalDate.now().minusDays(7), LocalDate.now(), "lunch", Sort.by("date"));
+
+                assertThat(result).hasSize(1);
+                assertThat(result.get(0).getName()).isEqualTo("Lunch");
+        }
+
+        // ─── getLatest5ExpensesForCurrentUser ──────────────────────────────────────
+
+        @Test
+        void getLatest5Expenses_shouldReturnList() {
+                when(profileService.getCurrentProfile()).thenReturn(mockProfile);
+                when(expenseRepository.findTop5ByProfileIdOrderByDateDesc(1L))
+                                .thenReturn(List.of(mockExpenseEntity));
+
+                List<ExpenseDTO> result = expenseService.getLatest5ExpensesForCurrentUser();
+
+                assertThat(result).hasSize(1);
+        }
 }

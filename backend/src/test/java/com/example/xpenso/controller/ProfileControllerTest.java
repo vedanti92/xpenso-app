@@ -30,123 +30,123 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 @AutoConfigureMockMvc(addFilters = false)
 class ProfileControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @MockitoBean
-    private ProfileService profileService;
+        @MockitoBean
+        private ProfileService profileService;
 
-    @MockitoBean
-    private JwtRequestFilter jwtRequestFilter;
+        @MockitoBean
+        private JwtRequestFilter jwtRequestFilter;
 
-    // ✅ ObjectMapper created manually — not @Autowired
-    private ObjectMapper objectMapper;
+        private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() {
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
+        @BeforeEach
+        void setUp() {
+                objectMapper = new ObjectMapper();
+                objectMapper.registerModule(new JavaTimeModule());
+                objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        }
 
-    // ─── POST /register ────────────────────────────────────────────────────────
+        // ─── POST /register ────────────────────────────────────────────────────────
 
-    @Test
-    void register_shouldReturn201() throws Exception {
-        ProfileDTO dto = ProfileDTO.builder()
-                .fullName("Vedanti Test")
-                .email("vedanti@test.com")
-                .password("password123")
-                .build();
+        @Test
+        void register_shouldReturn201() throws Exception {
+                ProfileDTO dto = ProfileDTO.builder()
+                                .fullName("Vedanti Test")
+                                .email("vedanti@test.com")
+                                .password("password123")
+                                .build();
 
-        ProfileDTO savedProfile = ProfileDTO.builder()
-                .id(1L)
-                .fullName("Vedanti Test")
-                .email("vedanti@test.com")
-                .build();
+                ProfileDTO savedProfile = ProfileDTO.builder()
+                                .id(1L)
+                                .fullName("Vedanti Test")
+                                .email("vedanti@test.com")
+                                .build();
 
-        when(profileService.registerProfile(any(ProfileDTO.class)))
-                .thenReturn(Map.of("profile", savedProfile, "message", "Registration successful."));
+                when(profileService.registerProfile(any(ProfileDTO.class)))
+                                .thenReturn(Map.of("profile", savedProfile, "message", "Registration successful."));
 
-        mockMvc.perform(post("/register")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value("Registration successful."));
-    }
+                mockMvc.perform(post("/register")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.message").value("Registration successful."));
+        }
 
-    // ─── POST /login ───────────────────────────────────────────────────────────
+        // ─── POST /login ───────────────────────────────────────────────────────────
 
-    @Test
-    void login_shouldReturn200_withToken() throws Exception {
-        AuthDTO authDTO = AuthDTO.builder()
-                .email("vedanti@test.com")
-                .password("password123")
-                .build();
+        @Test
+        void login_shouldReturn200_withToken() throws Exception {
+                AuthDTO authDTO = AuthDTO.builder()
+                                .email("vedanti@test.com")
+                                .password("password123")
+                                .build();
 
-        when(profileService.isAccountActive("vedanti@test.com")).thenReturn(true);
-        when(profileService.authenticateAndGenerateToken(any(AuthDTO.class)))
-                .thenReturn(Map.of("token", "mock.jwt.token"));
+                when(profileService.isAccountActive("vedanti@test.com")).thenReturn(true);
+                when(profileService.authenticateAndGenerateToken(any(AuthDTO.class)))
+                                .thenReturn(Map.of("token", "mock.jwt.token"));
 
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(authDTO)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("mock.jwt.token"));
-    }
+                mockMvc.perform(post("/login")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(authDTO)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.token").value("mock.jwt.token"));
+        }
 
-    @Test
-    void login_shouldReturn403_whenAccountNotActive() throws Exception {
-        AuthDTO authDTO = AuthDTO.builder()
-                .email("vedanti@test.com")
-                .password("password123")
-                .build();
+        @Test
+        void login_shouldReturn403_whenAccountNotActive() throws Exception {
+                AuthDTO authDTO = AuthDTO.builder()
+                                .email("vedanti@test.com")
+                                .password("password123")
+                                .build();
 
-        when(profileService.isAccountActive("vedanti@test.com")).thenReturn(false);
+                when(profileService.isAccountActive("vedanti@test.com")).thenReturn(false);
 
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(authDTO)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("Account is not active. Please activate your account first."));
-    }
+                mockMvc.perform(post("/login")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(authDTO)))
+                                .andExpect(status().isForbidden())
+                                .andExpect(jsonPath("$.message")
+                                                .value("Account is not active. Please activate your account first."));
+        }
 
-    // ─── GET /activate ─────────────────────────────────────────────────────────
+        // ─── GET /activate ─────────────────────────────────────────────────────────
 
-    @Test
-    void activate_shouldReturn302_whenTokenValid() throws Exception {
-        when(profileService.activateProfile("test-token-123")).thenReturn(true);
+        @Test
+        void activate_shouldReturn302_whenTokenValid() throws Exception {
+                when(profileService.activateProfile("test-token-123")).thenReturn(true);
 
-        mockMvc.perform(get("/activate").param("token", "test-token-123"))
-                .andExpect(status().isFound());
-    }
+                mockMvc.perform(get("/activate").param("token", "test-token-123"))
+                                .andExpect(status().isFound());
+        }
 
-    @Test
-    void activate_shouldReturn404_whenTokenInvalid() throws Exception {
-        when(profileService.activateProfile("bad-token")).thenReturn(false);
+        @Test
+        void activate_shouldReturn404_whenTokenInvalid() throws Exception {
+                when(profileService.activateProfile("bad-token")).thenReturn(false);
 
-        mockMvc.perform(get("/activate").param("token", "bad-token"))
-                .andExpect(status().isNotFound());
-    }
+                mockMvc.perform(get("/activate").param("token", "bad-token"))
+                                .andExpect(status().isNotFound());
+        }
 
-    // ─── GET /profile ──────────────────────────────────────────────────────────
+        // ─── GET /profile ──────────────────────────────────────────────────────────
 
-    @Test
-    @WithMockUser
-    void getProfile_shouldReturn200() throws Exception {
-        ProfileDTO profile = ProfileDTO.builder()
-                .id(1L)
-                .fullName("Vedanti Test")
-                .email("vedanti@test.com")
-                .build();
+        @Test
+        @WithMockUser
+        void getProfile_shouldReturn200() throws Exception {
+                ProfileDTO profile = ProfileDTO.builder()
+                                .id(1L)
+                                .fullName("Vedanti Test")
+                                .email("vedanti@test.com")
+                                .build();
 
-        when(profileService.getPublicProfile(null)).thenReturn(profile);
+                when(profileService.getPublicProfile(null)).thenReturn(profile);
 
-        mockMvc.perform(get("/profile"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("Vedanti Test"));
-    }
+                mockMvc.perform(get("/profile"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.fullName").value("Vedanti Test"));
+        }
 }

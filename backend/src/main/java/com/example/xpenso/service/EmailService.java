@@ -54,7 +54,7 @@ public class EmailService {
 
             Map<String, Object> payload = new HashMap<>();
             payload.put("sender", Map.of("name", fromName, "email", fromEmail));
-            payload.put("to", new Map[]{ Map.of("email", to) });
+            payload.put("to", new Map[] { Map.of("email", to) });
             payload.put("subject", subject);
             payload.put("htmlContent", body);
 
@@ -81,8 +81,7 @@ public class EmailService {
             String subject,
             String body,
             byte[] attachment,
-            String filename
-    ) {
+            String filename) {
         try {
             RestTemplate restTemplate = createRestTemplate();
             String url = "https://api.brevo.com/v3/smtp/email";
@@ -92,16 +91,15 @@ public class EmailService {
 
             Map<String, Object> payload = new HashMap<>();
             payload.put("sender", Map.of("name", fromName, "email", fromEmail));
-            payload.put("to", new Map[]{ Map.of("email", to) });
+            payload.put("to", new Map[] { Map.of("email", to) });
             payload.put("subject", subject);
             payload.put("htmlContent", body);
 
             // Add attachment here
-            payload.put("attachment", new Object[]{
+            payload.put("attachment", new Object[] {
                     Map.of(
                             "name", filename,
-                            "content", base64Attachment
-                    )
+                            "content", base64Attachment)
             });
 
             HttpHeaders headers = new HttpHeaders();

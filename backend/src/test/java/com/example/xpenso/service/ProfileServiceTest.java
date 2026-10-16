@@ -82,7 +82,8 @@ class ProfileServiceTest {
                 .thenReturn(java.util.concurrent.CompletableFuture.completedFuture(null));
 
         // inject @Value field manually
-        org.springframework.test.util.ReflectionTestUtils.setField(profileService, "activationURL", "http://localhost:8080");
+        org.springframework.test.util.ReflectionTestUtils.setField(profileService, "activationURL",
+                "http://localhost:8080");
         org.springframework.test.util.ReflectionTestUtils.setField(profileService, "returnActivationLink", true);
 
         Map<String, Object> response = profileService.registerProfile(dto);

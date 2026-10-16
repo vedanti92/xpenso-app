@@ -25,17 +25,19 @@ public class FilterController {
 
     @PostMapping
     public ResponseEntity<?> filterTransactions(@RequestBody FilterDTO filter) {
-//        preparing the data or validation
+        // preparing the data or validation
         LocalDate startDate = filter.getStartDate() != null ? filter.getStartDate() : LocalDate.of(2000, 1, 1);
         LocalDate endDate = filter.getEndDate() != null ? filter.getEndDate() : LocalDate.now();
         String keyword = filter.getKeyword() != null ? filter.getKeyword() : " ";
-        String sortField = (filter.getSortField() != null && !filter.getSortField().isEmpty()) ? filter.getSortField() : "date";
-        Sort.Direction direction = "desc".equalsIgnoreCase(filter.getSortOrder()) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        String sortField = (filter.getSortField() != null && !filter.getSortField().isEmpty()) ? filter.getSortField()
+                : "date";
+        Sort.Direction direction = "desc".equalsIgnoreCase(filter.getSortOrder()) ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
         Sort sort = Sort.by(direction, sortField);
         if ("income".equals(filter.getType())) {
             List<IncomeDTO> incomes = incomeService.filterIncomes(startDate, endDate, keyword, sort);
             return ResponseEntity.ok(incomes);
-        }  else if ("expense".equalsIgnoreCase(filter.getType())) {
+        } else if ("expense".equalsIgnoreCase(filter.getType())) {
             List<ExpenseDTO> expenses = expenseService.filterExpenses(startDate, endDate, keyword, sort);
             return ResponseEntity.ok(expenses);
         } else {
