@@ -1,37 +1,55 @@
-# Xpenso – Personal Expense Tracker
-Xpenso is a full-stack expense management application that allows users to track income, expenses, and view dashboards. It includes secure per-user access, email verification, and Excel export for improved usability.
+# Xpenso — Personal Expense Tracker
 
----
+Xpenso is a full-stack expense tracker for managing income and expenses, monitoring financial activity, and viewing a personalized dashboard.
+
+## Features
+- User registration, login, and JWT-based authentication
+- Income and expense management with categories
+- Dashboard with financial summaries and charts
+- Profile management with user-specific data access
+- Excel reports for income and expenses, including email delivery
+- Email-based account activation and profile image storage
 
 ## Tech Stack
-- **Backend:** Java, Spring Boot, Spring Security, REST APIs  
-- **Frontend:** React.js, TailwindCSS  
-- **Database:** MySQL (JPA/Hibernate)  
-- **Tools:** Docker, Maven, Cloudinary, EmailJS
+- **Frontend:** React, Tailwind CSS
+- **Backend:** Java, Spring Boot, Spring Security
+- **Database:** MySQL locally, PostgreSQL in production
+- **Integrations:** Brevo, Cloudinary
+- **Testing & CI:** JUnit, Mockito, GitHub Actions
 
----
+## Live Demo
+[Open Xpenso](https://xpenso-app.netlify.app/)
 
-## Key Features
-- User registration, login, and JWT-based authentication  
-- Expense and income tracking with categories  
-- Dashboard with aggregated financial metrics  
-- Profile management with secure per-user data access  
-- Excel export of transactions  
-- Email-based account verification  
-- Cloudinary integration for storing images  
+## Run Locally
 
----
+**Prerequisites:** Java 25, Node.js, npm, and a configured database.
 
-## Visit Website
-[https://xpenso-app.netlify.app/](https://xpenso-app.netlify.app/)
+1. Clone the repository.
+2. Configure the backend environment variables and database.
+3. Start the backend:
 
----
+   ```bash
+   cd backend
+   ./mvnw spring-boot:run
+   ```
+
+4. In another terminal, start the frontend:
+
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+Configure the database credentials, `JWT_SECRET`, Brevo credentials (`BREVO_API_KEY`, `BREVO_FROM_EMAIL`, `BREVO_FROM_NAME`), `XPENSO_FRONTEND_URL`, and `XPENSO_BACKEND_URL`. Set the frontend API URL according to your local backend configuration.
+
+## CI
+GitHub Actions runs backend tests and builds the frontend on pushes and pull requests to the configured branches.
 
 ## Screenshots
-<img width="1918" height="927" alt="image" src="https://github.com/user-attachments/assets/c1a41f03-2b3f-4cea-a57d-a4bc38bfa50a" />
-<img width="1918" height="927" alt="image" src="https://github.com/user-attachments/assets/eb65d3f2-54f9-451f-9998-6889c13f2fd2" />
-<img width="1918" height="927" alt="image" src="https://github.com/user-attachments/assets/1ff4c0ee-f463-4a69-8510-2f6630786f59" />
-<img width="1918" height="927" alt="image" src="https://github.com/user-attachments/assets/2eea2795-6cf4-4115-a783-8b1cf1b829af" />
-
-
+<img width="1763" height="805" alt="Screenshot_18-10-2026_174757_xpenso-app netlify app" src="https://github.com/user-attachments/assets/6ffd0025-350d-4cfc-bfbf-83059aff211e" />
+<img width="1763" height="805" alt="Screenshot_18-10-2026_174821_xpenso-app netlify app" src="https://github.com/user-attachments/assets/3ccc0826-9375-4c7d-a7df-afe75f7f9f93" />
+<img width="1763" height="805" alt="Screenshot_18-10-2026_174851_xpenso-app netlify app" src="https://github.com/user-attachments/assets/ef176260-ec1a-4b73-bcc9-b8f77e48a2fc" />
+<img width="1763" height="805" alt="Screenshot_18-10-2026_17499_xpenso-app netlify app" src="https://github.com/user-attachments/assets/b4c02e59-f570-4526-97ac-ffccbb61faab" />
+<img width="1910" height="872" alt="screenshot-1792326171971" src="https://github.com/user-attachments/assets/1beb7b15-d366-481d-880c-e6702a9c9922" />
 
